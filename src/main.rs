@@ -1,9 +1,11 @@
 use axum::{
-    extract::Multipart,
+    extract::{FromRequest, Multipart},
     response::Html,
     routing::{get, post},
     Router,
 };
+use std::io::prelude::*;
+use std::{fs::File, ops::Add, path::Path, str::FromStr};
 
 async fn upload_form() -> Html<&'static str> {
     r#"<form enctype="multipart/form-data" method="POST">
@@ -15,8 +17,15 @@ async fn upload_form() -> Html<&'static str> {
 
 async fn upload(mut multipart: Multipart) {
     while let Some(mut field) = multipart.next_field().await.unwrap() {
-        let name = field.name().unwrap().to_string();
+        let name: String = field.file_name().unwrap().to_string();
         let data = field.bytes().await.unwrap();
+        // field.
+        // let mut file = File::create
+        let mut path = String::from("dump/");
+        path.push_str(&name);
+        let mut file = File::create(path).unwrap();
+        file.write_all(&data).unwrap();
+
         println!("Len of `{}` is {} bytes", name, data.len())
     }
 }
