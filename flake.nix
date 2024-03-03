@@ -30,6 +30,7 @@
         { 
         default = pkgs.mkShell {
           name = "axum";
+          buildInputs = tools;
           
           
         };
